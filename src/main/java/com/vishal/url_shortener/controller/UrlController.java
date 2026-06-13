@@ -5,6 +5,7 @@ import com.vishal.url_shortener.dto.UrlRequest;
 import com.vishal.url_shortener.entity.Url;
 import com.vishal.url_shortener.service.QrCodeService;
 import com.vishal.url_shortener.service.UrlService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +15,15 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "*")
 @RequestMapping("/api/url")
 public class UrlController {
 
     private final UrlService service;
     private final QrCodeService qrCodeService;
+
+    @Value("${app.base-url}")
+    private String baseUrl;
 
     public UrlController(
             UrlService service,
@@ -40,7 +44,7 @@ public class UrlController {
 
         return new ShortenResponse(
                 shortCode,
-                "http://localhost:8080/api/url/" + shortCode
+                baseUrl + "/api/url/" + shortCode
         );
     }
 
@@ -75,9 +79,7 @@ public class UrlController {
             @PathVariable String shortCode)
             throws Exception {
 
-        String shortUrl =
-                "http://localhost:8080/api/url/"
-                        + shortCode;
+        String shortUrl = baseUrl + "/api/url/" + shortCode;
 
         return qrCodeService.generateQrCode(shortUrl);
     }
